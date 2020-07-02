@@ -1,0 +1,7 @@
+crontab entries:
+######## Resuspension stuff
+20 *               * * *   /home/ash3d/bin/Resuspension_Alert/Resusp1_Extract_MetAlarmVars.sh     > /home/ash3d/cron_logs/resusp1_getvars_log 2>&1
+30 6               * * *   /home/ash3d/bin/Resuspension_Alert/Resusp2_CheckAlertConditions.sh     > /home/ash3d/cron_logs/resusp2_check_log 2>&1
+35 6               * * *   /home/ash3d/bin/Resuspension_Alert/Resusp3_MakePlots.sh                > /home/ash3d/cron_logs/resusp3_plots_log 2>&1
+05 8               * * *   /home/ash3d/bin/Resuspension_Alert/Resusp4_runAsh3d_Katmai.sh          > /home/ash3d/cron_logs/resusp4_ash3d_log 2>&1
+

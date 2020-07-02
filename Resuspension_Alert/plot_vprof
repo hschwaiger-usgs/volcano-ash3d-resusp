@@ -1,0 +1,173 @@
+#!/usr/bin/octave
+
+clear all;
+
+file='vprofile01.txt';
+skip = 6;
+fid = fopen(file);
+for i=1:skip
+  fgets(fid);
+end
+ln = fgetl(fid);
+height=sscanf(ln,"%f",Inf);
+nh=max(size(height))
+n=1;
+while (! feof (fid) )
+  ln = fgetl(fid);
+  dt = sscanf(ln,"%f,",Inf);
+  rdata(n,:) = dt;
+  n = n + 1;
+endwhile
+date1=rdata(:,1);
+FChr1=rdata(:,2);
+data1=rdata(:,3:nh);
+fclose(fid);
+
+clear rdata;
+file='vprofile02.txt';
+skip = 6;
+fid = fopen(file);
+for i=1:skip
+  fgets(fid);
+end
+ln = fgetl(fid);
+height=sscanf(ln,"%f",Inf);
+nh=max(size(height))
+n=1;
+while (! feof (fid) )
+  ln = fgetl(fid);
+  dt = sscanf(ln,"%f,",Inf);
+  rdata(n,:) = dt;
+  n = n + 1;
+endwhile
+date2=rdata(:,1);
+FChr2=rdata(:,2);
+data2=rdata(:,3:nh);
+fclose(fid);
+
+clear rdata;
+file='vprofile03.txt';
+skip = 6;
+fid = fopen(file);
+for i=1:skip
+  fgets(fid);
+end
+ln = fgetl(fid);
+height=sscanf(ln,"%f",Inf);
+nh=max(size(height))
+n=1;
+while (! feof (fid) )
+  ln = fgetl(fid);
+  dt = sscanf(ln,"%f,",Inf);
+  rdata(n,:) = dt;
+  n = n + 1;
+endwhile
+date3=rdata(:,1);
+FChr3=rdata(:,2);
+data3=rdata(:,3:nh);
+fclose(fid);
+
+clear rdata;
+file='vprofile04.txt';
+skip = 6;
+fid = fopen(file);
+for i=1:skip
+  fgets(fid);
+end
+ln = fgetl(fid);
+height=sscanf(ln,"%f",Inf);
+nh=max(size(height))
+n=1;
+while (! feof (fid) )
+  ln = fgetl(fid);
+  dt = sscanf(ln,"%f,",Inf);
+  rdata(n,:) = dt;
+  n = n + 1;
+endwhile
+date4=rdata(:,1);
+FChr4=rdata(:,2);
+data4=rdata(:,3:nh);
+fclose(fid);
+
+clear rdata;
+file='vprofile05.txt';
+skip = 6;
+fid = fopen(file);
+for i=1:skip
+  fgets(fid);
+end
+ln = fgetl(fid);
+height=sscanf(ln,"%f",Inf);
+nh=max(size(height))
+n=1;
+while (! feof (fid) )
+  ln = fgetl(fid);
+  dt = sscanf(ln,"%f,",Inf);
+  rdata(n,:) = dt;
+  n = n + 1;
+endwhile
+date5=rdata(:,1);
+FChr5=rdata(:,2);
+data5=rdata(:,3:nh);
+fclose(fid);
+
+clear rdata;
+file='vprofile06.txt';
+skip = 6;
+fid = fopen(file);
+for i=1:skip
+  fgets(fid);
+end
+ln = fgetl(fid);
+height=sscanf(ln,"%f",Inf);
+nh=max(size(height))
+n=1;
+while (! feof (fid) )
+  ln = fgetl(fid);
+  dt = sscanf(ln,"%f,",Inf);
+  rdata(n,:) = dt;
+  n = n + 1;
+endwhile
+date6=rdata(:,1);
+FChr6=rdata(:,2);
+data6=rdata(:,3:nh);
+fclose(fid);
+
+% convert from mg to ug
+data6 = data6*1000.0;
+data5 = data5*1000.0;
+clim=[0.0, 3.0];
+%colormap(flipud(hot))
+colormap(jet)
+
+clf;
+
+kd_fig = figure;
+subplot(2,1,1),imagesc(FChr6,height,log10(data6)',clim);
+axis xy
+title('Log10 Ash Concentration at Kodiak (ug/m3)')
+ylabel('Height (km)');
+hcb=colorbar;
+subplot(2,1,2),plot(FChr6,data6(:,1))
+xlabel('Time (hours since 00 UTC)');
+ylabel('Surf. Ash Con (ug/m3)');
+axis([0 43 0 100]);
+%set(get(hcb,'Title'),'String','mg/m3')
+%saveas(kd_fig,'AirConcen_Kodiak.png');
+print -dpng AirConcen_Kodiak.png
+
+lb_fig = figure;
+subplot(2,1,1),imagesc(FChr5,height,log10(data5)',clim);
+axis xy
+title('Log10 Ash Concentration at Larsen Bay (ug/m3)')
+%xlabel('Time (hours since 00 UTC)');
+ylabel('Height (km)');
+hcb=colorbar;
+subplot(2,1,2),plot(FChr5,data5(:,1))
+xlabel('Time (hours since 00 UTC)');
+ylabel('Surf. Ash Con (ug/m3)');
+axis([0 43 0 100]);
+%set(get(hcb,'Title'),'String','mg/m3')
+% saveas(lb_fig,'AirConcen_LarsenBay.png');
+print -dpng AirConcen_LarsenBay.png
+

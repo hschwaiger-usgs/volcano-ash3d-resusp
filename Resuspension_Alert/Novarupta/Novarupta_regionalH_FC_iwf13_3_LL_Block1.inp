@@ -1,0 +1,29 @@
+#GENERAL SOURCE PARAMETERS. DO NOT DELETE ANY LINES
+*******************************************************************************
+Resuspension                      #Volcano name (character*30) (61.299,152.251)
+1 1 -150.0 90.0 0.933 6371.229     #Proj flags and params
+-155.5 57.0                #x, y of LL corner of grid (km, or deg. if latlongflag=1) -165 40
+3.5  1.5               #grid width and height (km, or deg. if latlonflag=1)
+-155.3 58.38  0.0              #vent location         (km, or deg. if latlonflag=1) 52.177N 175.508W
+0.02      0.02                  #DX, DY of grid cells  (km, or deg.)
+0.25                          #DZ of grid cells      (always km)
+1.0      resuspension             #diffusion coefficient (m2/s), Suzuki constant
+1                              #neruptions, number of eruptions or pulses
+*******************************************************************************
+#ERUPTION LINES (number = neruptions)
+#In the following line, each line represents one eruptive pulse.  
+#Parameters for all Ash3d sources start with:
+#  start time (yyyy mm dd h.hh (UT));  duration (hrs);  plume height
+#Resuspension source has the following format
+#yyyy
+#| mm
+#| | dd
+#| | |   hour
+#| | |   |     Duration
+#| | |   |      |   Height
+#| | |   |      |   |  EmissionScheme (1-west, 2=Lead, 3=Mort)
+#| | |   |      |   |  |   Ustar
+#| | |   |      |   |  |    |       Fv_coeff
+#| | |   |      |   |  |    |       |
+#0 0 0 0.0   35.0 5.0  2  0.5   6.0e-8
+*******************************************************************************

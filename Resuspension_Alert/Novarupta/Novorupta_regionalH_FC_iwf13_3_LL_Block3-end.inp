@@ -1,0 +1,135 @@
+*******************************************************************************
+#WIND OPTIONS
+*******************************************************************************
+4 13 91 3           #iwind, iwindFormat, igrid, file_format
+2                   #iHeightHandler
+35.0                #Simulation time in hours
+no                  #stop computation when 99% of erupted mass has deposited?
+37                  #nWindFiles, number of gridded wind files (used if iwind>1)
+*******************************************************************************
+#OUTPUT OPTIONS:
+*******************************************************************************
+no              #Print out ESRI ASCII file of final deposit thickness?              (WriteASCIIDepFile)
+yes             #Write out KML file of final deposit thickness?                     (WriteKMLDepFile)
+no              #Print out ESRI ASCII deposit files at specified times?             (WriteASCIIDepFiles)
+yes             #Write out KML deposit files at specified times?                    (WriteKMLDepFiles)
+no 		#Print out ASCII files of ash-cloud concentration?                  (WriteASCIICloudConcentration)
+yes		#Write out KML files of ash-cloud concentration ?                   (WriteKMLCloudConcentration)
+no              #Write out ASCII files of ash-cloud height?                         (WriteASCIICloudHeight)
+yes             #Write out KML files of ash-cloud height?                           (WriteKMLCloudHeight)
+no              #Write out ASCII files of ash-cloud load (T/km2) at specified times?
+yes             #Write out KML files of ash-cloud load (T/km2) at specified times?  (WriteKMLCloudLoad)
+no              #Write ASCII file of deposit arrival times?
+yes             #Write KML file of deposit arrival times?
+no              #write ASCII file of cloud arrival times?
+yes             #Write KML file of cloud arrival times?
+yes             #Print out 3-D ash concentration at specified times?                (Write3dFiles)                
+netcdf          #format of ash concentration files                              ('ascii', 'binary', or 'netcdf')
+-1              #nWriteTimes
+1.0
+*******************************************************************************
+#WIND INPUT FILES
+*******************************************************************************
+nam.t00z.alaskanest.hiresf00.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf01.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf02.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf03.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf04.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf05.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf06.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf07.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf08.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf09.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf10.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf11.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf12.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf13.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf14.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf15.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf16.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf17.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf18.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf19.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf20.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf21.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf22.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf23.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf24.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf25.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf26.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf27.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf28.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf29.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf30.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf31.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf32.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf33.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf34.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf35.tm00.loc.grib2
+nam.t00z.alaskanest.hiresf36.tm00.loc.grib2
+*******************************************************************************
+#AIRPORT LOCATION FILE
+*******************************************************************************
+yes                          #Write out ash arrival times at airports to ASCII FILE?
+no                           #Write out grain-size distribution to ASCII airport file?
+yes                          #Write out ash arrival times to kml file?
+GlobalAirports_ewert.txt     #Name of file containing aiport locations
+no                           #Have Proj4 calculate projected coordinates?
+*******************************************************************************
+#GRAIN SIZE GROUPS
+*******************************************************************************
+1 2
+0.0050  1.0 2000.0 0.8
+*******************************************************************************
+#Options for writing vertical profiles
+#The first line below gives the number of locations (nlocs) where vertical
+# profiles are to be written.  That is followed by nlocs lines, each of which
+#contain the location, in the same coordinate system specified above for the
+#volcano.
+#-240.92  -3452.72
+#-149.56  -3433.90
+*******************************************************************************
+6                             #number of locations for vertical profiles (nlocs)
+-153.5 58.25
+-154.0 58.0
+-154.5 57.75
+-155.0 57.5
+-153.98 57.54
+-152.41 57.79
+*******************************************************************************
+#netCDF output options
+*******************************************************************************
+3d_tephra_fall.nc           # Name of output file
+Katmai_Resusp_FC            # Title of simulation
+no comment                  # Comment
+*******************************************************************************
+# Topography
+*******************************************************************************
+OPTMOD=TOPO
+yes                           # use topography?
+2 1.0                         # Topofile format, smoothing radius
+GEBCO_08.nc                   # topofile name
+*******************************************************************************
+# Land cover data
+# format 1 = 1 deg
+#        2 = 8 km
+#        3 = 1 km
+*******************************************************************************
+OPTMOD=LC
+yes                       # Load land cover data
+3
+Landcover
+*******************************************************************************
+# Variable Diffusivity
+*******************************************************************************
+OPTMOD=VARDIFF
+yes                         # use horizontal variable diffusivity
+yes                         # use vertical variable diffusivity
+0.9                         # KH_SmagC
+0.4                         # vonKarman
+30.0                        # LambdaC
+0.25                        # RI_CRIT
+*******************************************************************************
+# Resuspension
+*******************************************************************************
+OPTMOD=SRC_RESUSP
