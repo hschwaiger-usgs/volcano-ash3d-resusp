@@ -23,31 +23,25 @@ echo "running runAsh3d_resusp.sh rundir out F F"
 echo `date`
 echo "------------------------------------------------------------"
 
-CLEANFILES="T"
-USECONTAINER="T"
-CONTAINEREXE="podman"
-CONTAINERRUNDIR="/run/user/1004/libpod/tmp"
-
 t0=`date -u`                                     # record start time
 rc=0                                             # error message accumulator
 
 HOST=`hostname | cut -c1-9`
 echo "HOST=$HOST"
-if [ "$USECONTAINER" == "T" ]; then
-  echo "Post processing scripts with be run with containers via ${CONTAINEREXE}"
-fi
+
 USGSROOT="/opt/USGS"
 ASH3DROOT="${USGSROOT}/Ash3d"
 WINDROOT="/data/WindFiles"
-NAMDATAHOME="${WINDROOT}/nam/091"
 
 ASH3DBINDIR="${ASH3DROOT}/bin"
 ASH3DEXEC="${ASH3DBINDIR}/Ash3d_res"
+#ASH3DEXEC="${ASH3DBINDIR}/Ash3d_vog_SnD01"
 ASH3DSCRIPTDIR="${ASH3DROOT}/bin/autorun_scripts"
 ASH3DWEBSCRIPTDIR="${ASH3DROOT}/bin/ash3dweb_scripts"
 ASH3DSHARE="$ASH3DROOT/share"
 ASH3DSHARE_PP="${ASH3DSHARE}/post_proc"
 
+NAMDATAHOME="${WINDROOT}/nam/091"
 #
 #Determine last downloaded windfile
 #LAST_DOWNLOADED=`cat ${WINDROOT}/gfs/last_downloaded.txt`
@@ -58,81 +52,96 @@ ASH3DSHARE_PP="${ASH3DSHARE}/post_proc"
 INFILE_MAIN="ash3d_resusp.inp"
 
 echo "checking input argument"
-if [ -z $1 ] ; then
-    echo "Error: you must specify an input directory containing the file ash3d_input_resusp.inp"
-    echo "Usage: runAsh3d_resusp.sh rundir zipname dash_flag run_ID java_thread_ID"
+if [ -z $1 ]
+then
+    echo "Error: you must specify an input directory containing the file ash3d_input_ac.inp"
     exit 1
   else
     RUNDIR=$1
     echo "run directory is $1"
 fi
 
-if [ -z $2 ] ; then
-    echo "Error: you must specify a zip file name"
-    exit 1
-  else
-    #ZIPNAME=`echo $2 | tr '/' '-'`        #if there are slashes in the name, replace them with dashes
-    ZIPNAME=$2
+if [ -z $2 ]
+then
+	echo "Error: you must specify a zip file name"
+	exit 1
+else
+        #ZIPNAME=`echo $2 | tr '/' '-'`        #if there are slashes in the name, replace them with dashes
+        ZIPNAME=$2
 fi
 
 DASHBOARD_RUN=$3
-RUNID=$4
-JAVAID=$5
+
+ADVANCED_RUN=$4
+echo "ADVANCED_RUN = $ADVANCED_RUN"
+if [ "$ADVANCED_RUN" = "advanced1" ]; then
+    echo "Advanced run, preliminary."
+  elif [ "$ADVANCED_RUN" = "advanced2" ]; then
+    echo "Advanced run using main input file"
+fi
 
 echo "changing directories to ${RUNDIR}"
-if test -r ${RUNDIR} ; then
+if test -r ${RUNDIR}
+then
     cd $RUNDIR
-    FULLRUNDIR=`pwd`
-    #echo "DASHBOARD_RUN = $DASHBOARD_RUN $3" > test.txt
+    echo "DASHBOARD_RUN = $DASHBOARD_RUN $3" > test.txt
   else
     mkdir -p $RUNDIR
     cd $RUNDIR
     #echo "Error: Directory ${RUNDIR} does not exist."
     #exit 1
 fi
-if [[ $? -ne 0 ]]; then
-    rc=$((rc + 1))
-fi
 
 if [[ $? -ne 0 ]]; then
            rc=$((rc + 1))
 fi
 
-echo "removing old input & output files"
-echo "rm -f *.gif *.kmz *.zip ${INFILE_PRELIM} *.txt cities.xy *.dat *.pdf 3d_tephra_fall.nc"
-rm -f *.gif *.kmz *.zip ${INFILE_PRELIM} *.txt cities.xy *.dat *.pdf 3d_tephra_fall.nc
-rc=$((rc + $?))
-echo "rc=$rc"
+#if it's an advanced tab run and argument 4 is set to "advanced2",
+#then skip to the last half of the script and read directly from the
+#input file
+if [ "$ADVANCED_RUN" != "advanced2" ]; then
 
-echo "copying airports file, cities file, and readme file"
-cp ${ASH3DSHARE}/GlobalAirports_ewert.txt .
-cp ${ASH3DSHARE}/readme.pdf .
-cp ${ASH3DSHARE_PP}/USGS_warning3.png .
-ln -s ${ASH3DSHARE_PP}/world_cities.txt .
-ln -s ${USGSROOT}/data/Topo/GEBCO_08.nc .
-ln -s ${USGSROOT}/data/Landcover .
-cp ${ASH3DSHARE_PP}/concentration_legend.png .
-cp ${ASH3DSHARE_PP}/CloudHeight_hsv.jpg .
-cp ${ASH3DSHARE_PP}/CloudLoad_hsv.png .
-cp ${ASH3DSHARE_PP}/cloud_arrival_time.png .
-#cp /opt/USGS/Ash3d/share/Resuspension_today/Katmai_H_deposit_outline_Sat_LonLat.csv .
-#cp /opt/USGS/Ash3d/share/Resuspension_today/${INFILE_MAIN} .
-deplines=`wc -l ../Katmai_H_deposit_outline_Sat_LonLat.csv | cut -d' ' -f1`
-echo "${deplines}" > dep_contour.csv
-cat ../Katmai_H_deposit_outline_Sat_LonLat.csv >> dep_contour.csv
-cp ../ash3d_resusp.inp .
-rc=$((rc + $?))
-echo "rc=$rc"
+   echo "removing old input & output files"
+   echo "rm -f *.gif *.kmz *.zip ${INFILE_PRELIM} *.txt cities.xy *.dat *.pdf 3d_tephra_fall.nc"
+   rm -f *.gif *.kmz *.zip ${INFILE_PRELIM} *.txt cities.xy *.dat *.pdf 3d_tephra_fall.nc
+   rc=$((rc + $?))
+   echo "rc=$rc"
 
-echo "creating soft links to wind files"
-rm nam.t*
-ln -s  ${NAMDATAHOME}/latest/nam.*.grib2 .
-rc=$((rc + $?))
-echo "rc=$rc"
+   echo "copying airports file, cities file, and readme file"
+   cp ${ASH3DSHARE}/GlobalAirports_ewert.txt .
+   cp ${ASH3DSHARE}/readme.pdf .
+   cp ${ASH3DSHARE_PP}/USGS_warning3.png .
+   ln -s ${ASH3DSHARE_PP}/world_cities.txt .
+   ln -s ${USGSROOT}/data/Topo/GEBCO_08.nc .
+   ln -s ${USGSROOT}/data/Landcover .
+   cp ${ASH3DSHARE_PP}/concentration_legend.png .
+   cp ${ASH3DSHARE_PP}/CloudHeight_hsv.jpg .
+   cp ${ASH3DSHARE_PP}/CloudLoad_hsv.png .
+   cp ${ASH3DSHARE_PP}/cloud_arrival_time.png .
+   #cp /opt/USGS/Ash3d/share/Resuspension_today/Katmai_H_deposit_outline_Sat_LonLat.csv .
+   #cp /opt/USGS/Ash3d/share/Resuspension_today/${INFILE_MAIN} .
+   deplines=`wc -l ../Katmai_H_deposit_outline_Sat_LonLat.csv | cut -d' ' -f1`
+   echo "${deplines}" > dep_contour.csv
+   cat ../Katmai_H_deposit_outline_Sat_LonLat.csv >> dep_contour.csv
+   cp ../ash3d_resusp.inp .
+   rc=$((rc + $?))
+   echo "rc=$rc"
+
+   echo "creating soft links to wind files"
+   rm nam.t*
+   ln -s  ${NAMDATAHOME}/latest/nam.*.grib2 .
+   rc=$((rc + $?))
+   echo "rc=$rc"
+fi    #End of block skipped when $ADVANCED_RUN="advanced2"
 
 echo "removing .dat file, preliminary ash3d input file"
 echo "rm -f *.dat"
 rm -f *.dat
+
+if [ "$ADVANCED_RUN" = "advanced1" ]; then
+    echo "Created input file for advanced tab.  Stopping"
+    exit
+fi
 
 echo "*******************************************************************************"
 echo "*******************************************************************************"

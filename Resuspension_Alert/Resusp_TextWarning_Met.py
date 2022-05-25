@@ -1,4 +1,4 @@
-import dircache, os
+#import dircache, os
 from string import *
 import sys
 import time
@@ -22,7 +22,7 @@ def send_alert(recipients,subject,body,filename=None):
 
         if filename:
                 name = filename.split('/')[-1]
-                print name
+                print(name)
                 attachment = open(filename, "rb")
                 part = MIMEBase('application', 'octet-stream')
                 part.set_payload((attachment).read())
@@ -47,7 +47,8 @@ MetRoot='/data/WindFiles/nam/091'
 FC_day=sys.argv[1]
 FCh=sys.argv[2]
 inflag=sys.argv[3]
-print FC_day + '  ' + FCh + '  ' + inflag
+outstr = FC_day + '  ' + FCh + '  ' + inflag
+print(outstr)
 MetDir='/data/WindFiles/nam/091/' + FC_day + '_00/'
 Us_DataFile='wgb_Us_00_' + FCh + '.dat'
 P0_DataFile='wgb_PRATE_00_' + FCh + '.dat'
@@ -85,7 +86,7 @@ if int(inflag) == 1:
              '  Vsm = ' + Vsm + '\n https://avo-vsc-ash.wr.usgs.gov/resusp.php'
 
 elif int(inflag) == 2:
-  print 'Summary'
+  print('Summary')
   # Preparing a summary text
   FChours=['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36']
   alert_body='SUMMARY Resusp Alert: Conditions favorible for resuspension\n' + \
@@ -98,11 +99,12 @@ elif int(inflag) == 2:
     with open(myDatafile) as f:
         Us = map(float, f)
         f.close()
-    print Us
+    print(Us)
     #alert_body=alert_body + FChours[fc] + Us + '\n' 
 
 else:
-  print 'Neither warning nor summary flags set: ' + inflag
+  outstr = 'Neither warning nor summary flags set: ' + inflag
+  print(outstr)
 
 #print alert_body
 send_alert(alert_recip,alert_sub,alert_body)

@@ -9,7 +9,11 @@
 #   Vol Soil Moist.   < THRESH_VSM=0.45
 # If all these conditions are met, then an email message is sent via a python script.
 # To process all 37 files should only take around a few seconds.
-
+#
+# Usage: Resusp2_CheckAlertConditions.sh [yyyymmdd]
+#          If argument is not provided, then the UTC date at run time will be used.
+#
+# Example crontab entry
 # 30 6 * * *   /home/ash3d/bin/Resuspension_Alert/Resusp2_CheckAlertConditions.sh     > /home/ash3d/cron_logs/resusp_check_log 2>&1
 
 if [ -z $1 ]
@@ -21,13 +25,14 @@ then
 fi
 source $HOME/.bash_profile
 
+
 WINDROOT=/data/WindFiles
 NAMAKDATAHOME="${WINDROOT}/nam/091"
 FC_day=${yearmonthday}_00                        #name of directory containing current files
 
 PubPage="https://avo-vsc-ash.wr.usgs.gov/resusp.php"
 PubDir="/data/www/vsc-ash.wr.usgs.gov/Resusp/"
-WarnText="/home/ash3d/bin/Resuspension_Alert/Resusp_TextWarning_Met.py"
+WarnText="${HOME}/bin/Resuspension_Alert/Resusp_TextWarning_Met.py"
 
 THRESH_SnD=0.1
 THRESH_FRICV=0.75
@@ -38,11 +43,13 @@ THRESH_VSM=0.45
 loc_start_date=`date`
 echo "-----------------------------------------------------------"
 echo "Running Resusp2_CheckAlertConditions.sh at ${loc_start_date}"
+echo "  Processing data for ${yearmonthday}"
 echo "  Using the following thresholds:"
 echo "    Snow Depth      = ${THRESH_SnD}"
 echo "    Friction Vel.   = ${THRESH_FRICV}"
 echo "    Precip. rate    = ${THRESH_PRATE}"
 echo "    Vol. Soil Moist = ${THRESH_VSM}"
+echo "  Running on ${HOSTNAME}"
 echo "-----------------------------------------------------------"
 
 # sanity check
@@ -157,7 +164,7 @@ do
              if (( $WARNING_SENT==0 ));
              then
                echo "Sending email message."
-               /usr/bin/python3 ${WarnText} ${yearmonthday} ${FChour[FCi]} 1
+               #/usr/bin/python3 ${WarnText} ${yearmonthday} ${FChour[FCi]} 1
                echo " called ${WarnText} ${yearmonthday} ${FChour[FCi]} 1"
                echo "1" > ${AlertFile1}
                WARNING_SENT=1
@@ -178,25 +185,25 @@ echo "-----------------------------------------------------------"
 echo "Finished Resusp2_CheckAlertConditions.sh at ${loc_end_date}"
 echo "-----------------------------------------------------------"
 
-## Now check if the last file has been downloaded and processed
-#if [ -f wgb_VSm_00_36.dat ]; then
-#  # If so, we might need to send a summary text; check if any warnings have been sent
-#  if (( $WARNING_SENT==1 ));
-#  then
-#    AlertFile2=Alert_Summary_Sent.txt
-#    if [ -f ${AlertFile2} ]; then
-#       echo "Text summary message has already been sent."
-#       SUMMARY_SENT=1
-#    else
-#       if (( $SUMMARY_SENT==0 ));
-#       then
-#         echo "Sending Summary text message."
-#         python /home/ash3d/bin/Resuspension_Alert/Resusp_TextWarning.py ${yearmonthday} 36 2
-#         echo "1" > ${AlertFile2}
-#         SUMMARY_SENT=1
-#       fi
-#    fi
-#  fi
-#fi
+# Now check if the last file has been downloaded and processed
+if [ -f wgb_VSm_00_36.dat ]; then
+  # If so, we might need to send a summary text; check if any warnings have been sent
+  if (( $WARNING_SENT==1 ));
+  then
+    AlertFile2=Alert_Summary_Sent.txt
+    if [ -f ${AlertFile2} ]; then
+       echo "Text summary message has already been sent."
+       SUMMARY_SENT=1
+    else
+       if (( $SUMMARY_SENT==0 ));
+       then
+         echo "Sending Summary text message."
+         python ${HOME}/bin/Resuspension_Alert/Resusp_TextWarning.py ${yearmonthday} 36 2
+         echo "1" > ${AlertFile2}
+         SUMMARY_SENT=1
+       fi
+    fi
+  fi
+fi
 
 

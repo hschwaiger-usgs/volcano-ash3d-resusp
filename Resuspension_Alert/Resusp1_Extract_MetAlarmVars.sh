@@ -11,7 +11,11 @@
 # Note, this script can be run frequently as it will not process files if the probe
 # files already exist in the forecast directory.
 # To process all 37 files should only take around 2-3 minutes.
-
+#
+# Usage: Resusp1_Extract_MetAlarmVars.sh [yyyymmdd]
+#          If argument is not provided, then the UTC date at run time will be used.
+#
+# Example crontab entry
 # 20 * * * *   /home/ash3d/bin/Resuspension_Alert/Resusp1_Extract_MetAlarmVars.sh     > /home/ash3d/cron_logs/resusp_getvars_log 2>&1
 
 if [ -z $1 ]
@@ -36,6 +40,18 @@ echo "to files in the format wgb_[var]_[ip][ip]_[FChour].dat"
 echo "-----------------------------------------------------------"
 
 MYWGRIB=/home/ash3d/Programs/Tarballs/grib2/wgrib2/wgrib2
+rc=0
+echo "Looking for wgrib2"
+which wgrib2
+rc=$((rc + $?))
+if [[ "$rc" -gt 0 ]] ; then
+  echo "Error: Could not find wgrib2 in your path rc=$rc"
+  exit 1
+else
+  MYWGRIB=`which wgrib2`
+  MYWGRIB_VER=`${MYWGRIB} -version | cut -c 2-8`
+fi
+
 # sanity check
 if [ -f ${MYWGRIB} ]; then
   echo "Using ${MYWGRIB} to probe files."

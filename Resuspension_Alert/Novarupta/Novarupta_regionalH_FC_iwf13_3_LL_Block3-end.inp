@@ -3,7 +3,7 @@
 *******************************************************************************
 4 13 91 3           #iwind, iwindFormat, igrid, file_format
 2                   #iHeightHandler
-35.0                #Simulation time in hours
+31.0                #Simulation time in hours
 no                  #stop computation when 99% of erupted mass has deposited?
 37                  #nWindFiles, number of gridded wind files (used if iwind>1)
 *******************************************************************************
@@ -30,7 +30,6 @@ netcdf          #format of ash concentration files                              
 *******************************************************************************
 #WIND INPUT FILES
 *******************************************************************************
-nam.t00z.alaskanest.hiresf00.tm00.loc.grib2
 nam.t00z.alaskanest.hiresf01.tm00.loc.grib2
 nam.t00z.alaskanest.hiresf02.tm00.loc.grib2
 nam.t00z.alaskanest.hiresf03.tm00.loc.grib2
@@ -63,10 +62,6 @@ nam.t00z.alaskanest.hiresf29.tm00.loc.grib2
 nam.t00z.alaskanest.hiresf30.tm00.loc.grib2
 nam.t00z.alaskanest.hiresf31.tm00.loc.grib2
 nam.t00z.alaskanest.hiresf32.tm00.loc.grib2
-nam.t00z.alaskanest.hiresf33.tm00.loc.grib2
-nam.t00z.alaskanest.hiresf34.tm00.loc.grib2
-nam.t00z.alaskanest.hiresf35.tm00.loc.grib2
-nam.t00z.alaskanest.hiresf36.tm00.loc.grib2
 *******************************************************************************
 #AIRPORT LOCATION FILE
 *******************************************************************************

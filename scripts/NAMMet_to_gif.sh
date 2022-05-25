@@ -9,24 +9,35 @@
 
 # 35 6 * * *   /home/ash3d/bin/Resuspension_Alert/Resusp3_MakePlots.sh                > /home/ash3d/cron_logs/resusp3_plots_log 2>&1
 
+echo "------------------------------------------------------------"
+echo "running NAMMet_to_gif.sh"
+if [ "$#" -eq 1 ]; then
+  echo "Command line argument detected: setting run directory"
+  RUNHOME=$1
+ else
+  RUNHOME=`pwd`
+fi
+cd ${RUNHOME}
+echo `date`
+echo "------------------------------------------------------------"
+
 #yearmonthday=$1
 # Get today's date in local time (not UTC, hence the missing -u)
 #yearmonthday=`date +%Y%m%d`
-yearmonthday=`date -u +%Y%m%d`
+#yearmonthday=`date -u +%Y%m%d`
 #source $HOME/.bash_profile
 
-#USGSROOT="/opt/USGS"
-#ASH3DROOT="${USGSROOT}/Ash3d"
+USGSROOT="/opt/USGS"
+ASH3DROOT="${USGSROOT}/Ash3d"
 #ASH3DBINDIR="${ASH3DROOT}/bin"
 #ASH3DSCRIPTDIR="${ASH3DROOT}/bin/scripts"
 WINDROOT=/data/WindFiles
 NAMAKDATAHOME="${WINDROOT}/nam/091"
-FC_day=${yearmonthday}_00                        #name of directory containing current files
+#FC_day=${yearmonthday}_00                        #name of directory containing current files
 USEPODMAN="T"
 
-RUNHOME="/run/user/1004/libpod/tmp"
-cd ${RUNHOME}
-
+DepFile1=${ASH3DROOT}/bin/Resuspension_Alert/Novarupta/Novarupta_VTTS_deposit_outline_LonLat.csv   
+DepFile2=${ASH3DROOT}/bin/Resuspension_Alert/Novarupta/Novarupta_H_deposit_outline_Sat_LonLat.csv
 #ResuspHTTP=/webdata/int-vsc-ash.wr.usgs.gov/htdocs/Resusp
 #ResuspHTTP=/data/www/vsc-ash.wr.usgs.gov/Resusp
 
@@ -65,7 +76,7 @@ GMTrgr=("-" "-" "-" "-" "grdreformat" "grdconvert")
 GMTpen=("-" "-" "-" "-" "/" ",")
 echo "GMT version = ${GMTv}"
 
-${GMTpre[GMTv]} gmtset PAPER_MEDIA=a3
+${GMTpre[GMTv]} gmtset PS_MEDIA=a2
 # Katmai coordinates
 vlt=58.279
 vln=-154.9533
@@ -92,12 +103,12 @@ AREA="-R${lonw}/${lats}/${lone}/${latn}r"
 BASE="-Ba2g2/2g1 -P"
 BASE="-Bg2/g1 -P"
 DETAIL="-Df"
-COAST="-W5"
+COAST="-W1"
 
-makecpt -T0/0.03/0.03 -I -Z -Cocean > snwdpth.cpt
-#makecpt -T0/20/20 -Z -Crainbow > ws.cpt
-makecpt -T0/20/20 -Z -Ccool > ws.cpt
-makecpt -T0/2.6/2.6 -Z -Crainbow > srfrgh.cpt
+${GMTpre[GMTv]} makecpt -T0/0.03/0.03 -I -Z -Cocean > snwdpth.cpt
+#${GMTpre[GMTv]} makecpt -T0/20/20 -Z -Crainbow > ws.cpt
+${GMTpre[GMTv]} makecpt -T0/20/20 -Z -Ccool > ws.cpt
+${GMTpre[GMTv]} makecpt -T0/2.6/2.6 -Z -Crainbow > srfrgh.cpt
 
 tmax=37
 #tmax=2
@@ -111,7 +122,7 @@ do
  else
   tlabel="$tii"
  fi
- outfile=Katmai_NAM091_${FC_day}_${tlabel}.gif
+ outfile=Katmai_NAM091_${tlabel}.gif
  grbfile=nam.t00z.alaskanest.hiresf${tlabel}.tm00.loc.grib2
  infile=nam.t00z.alaskanest.hiresf${tlabel}.tm00.loc.grib2.nc
 
@@ -121,7 +132,7 @@ do
  else
    if [ -f ${grbfile} ]; then
      # Here's a fresh grib file; process it and make a map
-     /home/ash3d/bin/grib2nc.sh ${grbfile}
+     ${HOME}/bin/grib2nc.sh ${grbfile}
      ${GMTpre[GMTv]} ${GMTrgr[GMTv]} "${infile}?Snow_depth_surface[0]" snowdepth_${tlabel}.grd
      #${GMTpre[GMTv]} ${GMTrgr[GMTv]} "${infile}?Frictional_Velocity_surface[0]" ustar_${tlabel}.grd
      ${GMTpre[GMTv]} ${GMTrgr[GMTv]} "${infile}?Wind_speed_gust_surface[0,0]" windspeed_${tlabel}.grd
@@ -136,34 +147,41 @@ do
 
      ${GMTpre[GMTv]} pscoast $AREA $PROJg $BASE $DETAIL $COAST -K  > temp.ps
      ${GMTpre[GMTv]} grdimage SnowDepth_sub.grd $PROJp  -Csnwdpth.cpt -O -K >> temp.ps
-     #${GMTpre[GMTv]} grdcontour FricVel_sub.grd $PROJp -C0.5 -W2/255/255/0 -O -K >> temp.ps
-     ${GMTpre[GMTv]} grdcontour ws_sub.grd $PROJp -C10.0 -W2/255/0/0 -O -K >> temp.ps
-     ${GMTpre[GMTv]} grdcontour ws_sub.grd $PROJp -C20.0 -W6/255/0/0 -O -K >> temp.ps
-     ${GMTpre[GMTv]} psxy /home/ash3d/bin/Resuspension_Alert/Katmai_VTTS_deposit_outline_LonLat.csv   $AREA $PROJg -P -M -K -O -W2/255/255/0 -V >> temp.ps
-     ${GMTpre[GMTv]} psxy /home/ash3d/bin/Resuspension_Alert/Katmai_H_deposit_outline_Sat_LonLat.csv  $AREA $PROJg -P -M -K -O -W6/0/255/0 -V >> temp.ps
+     if [ $GMTv -eq 4 ] ; then
+       #${GMTpre[GMTv]} grdcontour FricVel_sub.grd $PROJp -C0.5 -W2/255/255/0 -O -K >> temp.ps
+       ${GMTpre[GMTv]} grdcontour ws_sub.grd $PROJp -C10.0 -W2/255/0/0 -O -K >> temp.ps
+       ${GMTpre[GMTv]} grdcontour ws_sub.grd $PROJp -C20.0 -W4/255/0/0 -O -K >> temp.ps
+     else
+       # GMT v5 [GMTv]writes contour files as a separate step from drawing and writes all segments to one file
+       ${GMTpre[GMTv]} grdcontour ws_sub.grd $PROJp -C10.0 -A- -W2,255/0/0 -O -K >> temp.ps
+       ${GMTpre[GMTv]} grdcontour ws_sub.grd $PROJp -C20.0 -A- -W4,255/0/0 -O -K >> temp.ps
+     fi
+
+     ${GMTpre[GMTv]} psxy ${DepFile1} $AREA $PROJg -P -K -O -W2,255/255/0 -V >> temp.ps
+     ${GMTpre[GMTv]} psxy ${DepFile2} $AREA $PROJg -P -K -O -W4,0/255/0 -V >> temp.ps
      ${GMTpre[GMTv]} pscoast $AREA $PROJg $DETAIL $COAST -O -K >> temp.ps
-     ${GMTpre[GMTv]} grdvector u10_sub.grd v10_sub.grd $PROJp -Cws.cpt -S20.0 -W2 -O -K >> temp.ps
+     ${GMTpre[GMTv]} grdvector u10_sub.grd v10_sub.grd $PROJp -Cws.cpt -S20.0 -W1 -O -K >> temp.ps
      ${GMTpre[GMTv]} psscale -D1.2i/-0.05i/2i/0.15ih -Cws.cpt -B5f5/:"Low-level Wind Speed (m/s)": -O -K >> temp.ps
      ${GMTpre[GMTv]} psscale -D1.2i/-0.5i/2i/0.15ih -Csnwdpth.cpt -B0.01f0.01/:"Snow Depth (m)": -O -K >> temp.ps
      ${GMTpre[GMTv]} psbasemap $AREA $PROJg $BASE -O -K >> temp.ps
      echo $vln $vlt '1.0' | ${GMTpre[GMTv]} psxy $AREA $PROJg -St0.1i -Gred -Wthinnest -O -K >> temp.ps
-     ${GMTpre[GMTv]} pslegend $AREA $PROJg $BASE -G255 -F -D-155.9/59.4/5.0i/0.8i/BL -O << EOF >> temp.ps
+     ${GMTpre[GMTv]} pslegend $AREA $PROJg $BASE -F+gazure1 -D-155.9/59.4/5.0i/0.8i/BL -O << EOF >> temp.ps
 C black
 H 12 1 Low-level Wind Speed (NAM91) $FC_day + $tlabel
 D 0.05i 1p
 N 2
 V 0.0 1p
-S 0.1i - 0.15i - 6/255/255/0 0.3i VTTS deposit
-S 0.1i - 0.15i - 2/255/0/0   0.3i Surface gusts >10m/s
-S 0.1i - 0.15i - 6/0/255/0   0.3i UnitH deposit
-S 0.1i - 0.15i - 6/255/0/0   0.3i Surface gusts >20m/s
+S 0.1i - 0.15i - 6,255/255/0 0.3i VTTS deposit
+S 0.1i - 0.15i - 2,255/0/0   0.3i Surface gusts >10m/s
+S 0.1i - 0.15i - 6,0/255/0   0.3i UnitH deposit
+S 0.1i - 0.15i - 6,255/0/0   0.3i Surface gusts >20m/s
 EOF
-     ps2raster -A -Te temp.ps
+     #ps2raster -A -Te temp.ps
      ps2epsi temp.ps temp.eps
      epstopdf temp.eps
      convert temp.pdf -background white -flatten ${outfile}
      rm temp.* *.grd
-     #rm ${infile}
+     rm ${infile}
    fi
  fi
 done
